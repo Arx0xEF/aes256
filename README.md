@@ -4,8 +4,8 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/status-in%20progress-yellow" />
-  <img src="https://img.shields.io/github/languages/top/USERNAME/REPO" />
-  <img src="https://img.shields.io/github/license/USERNAME/REPO" />
+  <img src="https://img.shields.io/github/languages/top/Arx0xEF/aes256" />
+  <img src="https://img.shields.io/github/license/Arx0xEF/aes256" />
   <img src="https://img.shields.io/badge/Editor-Vim-019733?logo=vim" />
 </p>
 
