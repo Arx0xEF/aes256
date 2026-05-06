@@ -1,24 +1,9 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <inttypes.h>
+#include "aes.h"
 
-void subBytes(uint8_t state_blk[]);
-
-int main(int argc, char **argv) {
-
-    // initial commit
-
-    uint8_t str[17] = "iambatmannnnnnnn\0";
-    fprintf(stdout, "before subBytes: %s\n", str);
-    subBytes(str);
-    fprintf(stdout, "after subBytes: %s\n", str);
-
-    return 0;
-}
-
-void subBytes(uint8_t state_blk[]) {
+void subBytes(aes_state *state) {
 //  s-box as per FIPS 197 AES
     static const uint8_t s_box[16][16] = {
+                        {0x63,0x7c,0x77,0x7b,0xf2,0x6b,0x6f,0xc5,0x30,0x01,0x67,0x2b,0xfe,0xd7,0xab,0x76},
                         {0xca,0x82,0xc9,0x7d,0xfa,0x59,0x47,0xf0,0xad,0xd4,0xa2,0xaf,0x9c,0xa4,0x72,0xc0},
                         {0xb7,0xfd,0x93,0x26,0x36,0x3f,0xf7,0xcc,0x34,0xa5,0xe5,0xf1,0x71,0xd8,0x31,0x15},
                         {0x04,0xc7,0x23,0xc3,0x18,0x96,0x05,0x9a,0x07,0x12,0x80,0xe2,0xeb,0x27,0xb2,0x75},
@@ -40,35 +25,59 @@ void subBytes(uint8_t state_blk[]) {
     // fprintf(stdout, "test byte = %" PRIu8 "\n", tstByte);
 
     // state block 16 bytes substitution with s-box
-    for(size_t i = 0; i < 16; i++) {
-        const uint8_t xValue = state_blk[i] >> 4;       // first nibble
-        const uint8_t yValue = state_blk[i] & 0x0f;     // second nibble
-        state_blk[i] = s_box[xValue][yValue];           // assign s-box byte
+    for(size_t i = 0; i < 4; i++) {
+        for(size_t j = 0; j < 4; j++) {
+            const uint8_t xValue = state->state_arr[i][j] >> 4;       // first nibble
+            const uint8_t yValue = state->state_arr[i][j] & 0x0f;     // second nibble
+            state->state_arr[i][j] = s_box[xValue][yValue];
 
-        // value logs
-        //    fprintf(stdout, "x = %" PRIu8 "\n", xValue);
-        //    fprintf(stdout, "y = %" PRIu8 "\n", yValue);
-        //    fprintf(stdout, "s-box value = 0x%0x\n", s_box[xValue][yValue]);
+            // value logs
+            //    fprintf(stdout, "x = %" PRIu8 "\n", xValue);
+            //    fprintf(stdout, "y = %" PRIu8 "\n", yValue);
+            //    fprintf(stdout, "s-box value = 0x%0x\n", s_box[xValue][yValue]);
+
+            //    logging hexadecimal values
+            //    printf("%0x\n", state->state_arr[i][j]);
+        }
     }
 }
 
+// conversion of a plaintext array to the 2D 4x4 array
+void plain_text_to_state(aes_state *state, uint8_t plain_bytes[]) {
+    size_t temp = 0;
+    for(size_t i = 0; i < 4; i++) {
+        for(size_t j = 0; j < 4; j++) {
+            state->state_arr[i][j] = plain_bytes[temp++];
+            // logging column major result
+            //printf("temp = %" PRIu64 "\n", temp);
+//            printf(" [");
+//            putchar(state->state_arr[i][j]);
+//            printf("] ");
+        }
+    }
+}
 
+// shifting Rows of the state block cyclically
+// shift value depends on the row number
+void shiftRows(aes_state *state) {
+    uint8_t temp[4] = {0};
+    for(size_t i = 1; i < 4; i++) {
+        for(size_t j = 0; j < 4; j++) {
+            temp[j] = state->state_arr[i][j];
+        }
+        for(size_t k = 0; k < 4; k++)
+            state->state_arr[i][k] = temp[(k + i) % 4];
+    }
+}
 
+// to log state block to debug errors
+void logState(aes_state *state) {
+    for(size_t i = 0; i < 4; i++)
+        for(size_t j = 0; j < 4; j++)  {
+            printf(" [");
+            putchar(state->state_arr[i][j]);
+            printf("] ");
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 

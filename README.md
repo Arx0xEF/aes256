@@ -14,8 +14,8 @@
 **A CLI tool to encrypt and decrypt files using AES-256.**
 
 ## status
-- currently working implementing the AES core (subBytes stage).
-- It'll support the CBC and CTR modes in future 
+- currently working implementing the AES core (mixColumns stage).
+- It'll support the CBC and CTR modes in future.
 
 ## Features
 - AES-256 encryption
@@ -25,11 +25,12 @@
 - (Planned) CBC mode support
 
 ## Current Progress
-- [ ] Key Expansion
+- [x] plain bytes to 4X4 2D Matrix
 - [x] SubBytes
-- [ ] ShiftRows
+- [x] ShiftRows
 - [ ] MixColumns
 - [ ] AddRoundKey
+- [ ] Key Expansion
 
 ## Disclaimer
 This project is for educational purposes only.
